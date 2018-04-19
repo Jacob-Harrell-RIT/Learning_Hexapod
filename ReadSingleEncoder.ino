@@ -4,17 +4,18 @@ const int analogInPin = A0;  // Analog input pin that the potentiometer is attac
 int sensorValue = 0;        // value read from the pot
 int n=0;
 void setup() {
-  Serial.begin(115200); 
+  Serial.begin(9600); 
 }
 
-void loop() {
+void loop(){
   // read the analog in value:
   for(n=0;n<=5;n++){
     sensorValue = analogRead(analogInPin+n);            
     Serial.print("s" );  
     Serial.print(n);
+    Serial.print(':');
     Serial.print(sensorValue);   
     Serial.print(",");
-  {
-  println();                        
+  }
+  Serial.println();                        
 }
