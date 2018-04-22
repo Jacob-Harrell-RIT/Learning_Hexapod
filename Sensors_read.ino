@@ -7,6 +7,8 @@ Adafruit_LSM303 lsm;
 const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
 int sensorValue = 0;        // value read from the pot
 int n=0;
+double vel_est=0;
+double accel_est=0;
 
 void setup(void)
 {
@@ -15,6 +17,7 @@ void setup(void)
   pinMode(13,OUTPUT);
   digitalWrite(13,0);
   /* Initialise the sensors */
+  
   if(!lsm.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
@@ -35,12 +38,16 @@ void loop(void)
   if(accelRDY==1){
     lsm.read();
     /* Display the results (acceleration is measured in m/s^2) */
-    Serial.print("Accel X: "); Serial.print((int)lsm.accelData.x); Serial.print(" ");
-    Serial.print("Y: "); Serial.print((int)lsm.accelData.y);       Serial.print(" ");
-    Serial.print("Z: "); Serial.print((int)lsm.accelData.z);     Serial.print(" ");
-    Serial.print("Mag X: "); Serial.print((int)lsm.magData.x);     Serial.print(" ");
-    Serial.print("Y: "); Serial.print((int)lsm.magData.y);         Serial.print(" ");
-    Serial.print("Z: "); Serial.println((int)lsm.magData.z);       Serial.print(" ");
+    accel_est=(((float)((int)lsm.accelData.x/(800))/10));
+    vel_est+=((accel_est)*9.81/15);
+    Serial.print("X: "); Serial.print(lsm.accelData.x/(8000)+0.02); Serial.print(" ");
+    Serial.print("Y: "); Serial.print(lsm.accelData.y/8000-0.02);       Serial.print(" ");
+    Serial.print("Z: "); Serial.print(lsm.accelData.z/8000-0.01);     Serial.print(" ");
+    Serial.print("accel_est:"); Serial.print(accel_est);Serial.print(" ");
+    Serial.print("v_x: "); Serial.println(vel_est);
+    /*Serial.print("Mag X: "); Serial.print(lsm.magData.x);     Serial.print(" ");
+    Serial.print("Y: "); Serial.print(lsm.magData.y);         Serial.print(" ");
+    Serial.print("Z: "); Serial.println(lsm.magData.z);       Serial.print(" ");//*/
     // read the analog joint angles:
     for(n=0;n<=5;n++){
       sensorValue = analogRead(analogInPin+n);            
