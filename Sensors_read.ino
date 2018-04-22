@@ -7,8 +7,8 @@ Adafruit_LSM303 lsm;
 const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
 int sensorValue = 0;        // value read from the pot
 int n=0;
-double vel_est=0;
-double accel_est=0;
+long int now=0;
+long int past=0;
 
 void setup(void)
 {
@@ -16,7 +16,8 @@ void setup(void)
   pinMode(2,INPUT);
   pinMode(13,OUTPUT);
   digitalWrite(13,0);
-  /* Initialise the sensors */
+  past=millis();
+  now=millis();
   
   if(!lsm.begin())
   {
@@ -36,10 +37,11 @@ void loop(void)
 {
   /* Get a new sensor event */
   if(accelRDY==1){
+    now=millis();
     lsm.read();
     /* Display the results (acceleration is measured in m/s^2) */
-    accel_est=(((float)((int)lsm.accelData.x/(819))/10));
-    vel_est+=((accel_est)*9.81/15);
+    //accel_est=(((float)((int)lsm.accelData.x/(819))/10));
+    //vel_est+=((accel_est)*9.81/15);
     Serial.print("a:");
     Serial.print("X:"); Serial.print((int)lsm.accelData.x);Serial.print(",");
     Serial.print("Y:"); Serial.print((int)lsm.accelData.y);Serial.print(",");
@@ -59,6 +61,8 @@ void loop(void)
       Serial.print(sensorValue);   
       Serial.print(",");
     }
+    Serial.print("t:");Serial.print(now-past);
+    past=now;
     digitalWrite(13,0);
     accelRDY=0;
     Serial.println();
