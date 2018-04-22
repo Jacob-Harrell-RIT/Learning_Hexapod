@@ -38,16 +38,18 @@ void loop(void)
   if(accelRDY==1){
     lsm.read();
     /* Display the results (acceleration is measured in m/s^2) */
-    accel_est=(((float)((int)lsm.accelData.x/(800))/10));
+    accel_est=(((float)((int)lsm.accelData.x/(819))/10));
     vel_est+=((accel_est)*9.81/15);
-    Serial.print("X: "); Serial.print(lsm.accelData.x/(8000)+0.02); Serial.print(" ");
-    Serial.print("Y: "); Serial.print(lsm.accelData.y/8000-0.02);       Serial.print(" ");
-    Serial.print("Z: "); Serial.print(lsm.accelData.z/8000-0.01);     Serial.print(" ");
-    Serial.print("accel_est:"); Serial.print(accel_est);Serial.print(" ");
-    Serial.print("v_x: "); Serial.println(vel_est);
-    /*Serial.print("Mag X: "); Serial.print(lsm.magData.x);     Serial.print(" ");
-    Serial.print("Y: "); Serial.print(lsm.magData.y);         Serial.print(" ");
-    Serial.print("Z: "); Serial.println(lsm.magData.z);       Serial.print(" ");//*/
+    Serial.print("a:");
+    Serial.print("X:"); Serial.print((int)lsm.accelData.x);Serial.print(",");
+    Serial.print("Y:"); Serial.print((int)lsm.accelData.y);Serial.print(",");
+    Serial.print("Z:"); Serial.print((int)lsm.accelData.z);Serial.print(",");
+    //Serial.print("accel_est:"); Serial.print(accel_est);
+    //Serial.print("v_x: "); Serial.print(vel_est);
+    Serial.print("m:");
+    Serial.print("X:"); Serial.print((int)lsm.magData.x);Serial.print(",");
+    Serial.print("Y:"); Serial.print((int)lsm.magData.y);Serial.print(",");
+    Serial.print("Z:"); Serial.print((int)lsm.magData.z);Serial.print(",");
     // read the analog joint angles:
     for(n=0;n<=5;n++){
       sensorValue = analogRead(analogInPin+n);            
@@ -59,6 +61,7 @@ void loop(void)
     }
     digitalWrite(13,0);
     accelRDY=0;
+    Serial.println();
   }
 }
 
@@ -66,3 +69,5 @@ void LSM_RDY(void){
   accelRDY=1;
   digitalWrite(13,1);
  }
+ 
+ 
