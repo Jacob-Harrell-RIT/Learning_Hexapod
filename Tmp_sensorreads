@@ -32,10 +32,10 @@ int sensorValue = 0;
 double vel_est=0;
 double accel_est=0;
 long int init_accel[3]={0,0,0};
-long int first_acc_done=0;
-long int first_acc_count=0;
-long int init_orient[3]={0,0,0};
-long int comp_mag_orient[3]={0,0,0};
+int first_acc_done=0;
+int first_acc_count=0;
+double init_orient[3]={0,0,0};//RPY
+double comp_mag_orient[3]={0,0,0};
 int magaxdown=0;//0 is x, 1 is y, 2 is z
 
 void loop(void)
@@ -50,7 +50,7 @@ void loop(void)
     if(first_acc_done==0){
      if (first_acc_count<10){
        first_acc_count++;
-       Serial.println(first_acc_count);
+       //Serial.println(first_acc_count);
        for(int k=0;k<3;k++){
          init_accel[k]+=accelxyz[k];
        }         
@@ -78,7 +78,7 @@ void loop(void)
        while(1){//        digitalWrite(13,1);
         delay(1000);
         digitalWrite(13,0);
-        delay(1000);busly loop and flash half slow
+        delay(1000);//busy loop and flash half slow
         digitalWrite(13,1);
         delay(500);
         digitalWrite(13,0);
@@ -86,7 +86,19 @@ void loop(void)
        }
      }
      else if(magaxdown==2){//z axis down, this is normal.
-            
+     //based on adafruit's 9-DOF library and ST reeference document
+     //http://www.st.com/content/ccc/resource/technical/document/design_tip/group0/56/9a/e4/04/4b/6c/44/ef/DM00269987/files/DM00269987.pdf/jcr:content/translations/en.DM00269987.pdf
+          init_orient[0]=atan2((double)init_accel[1],(double)init_accel[2]);//roll
+          double Gz2=(double)init_accel[1]*sin(init_orient[0])+(double)init_accel[2]*cos(init_orient[0]);
+          init_orient[1]=atan(-((double)init_accel[0])/Gz2);
+          double Gy2=(double)init_accel[2]*sin(init_orient[0])-(double)init_accel[1]*cos(init_orient[0]);
+          double Gx2=(double)init_accel[0]*cos(init_orient[1])-(double)init_accel[2]*sin(init_orient[1]);
+          init_orient[3]=atan2(Gy2,Gx2);
+     }
+     for(int k=0;k<3;k++){
+     Serial.println(init_orient[k]);
+     
+     
      }
      first_acc_done=1;  
      }
@@ -99,15 +111,17 @@ void loop(void)
       //accel_est=(((float)((int)lsm.accelData.x/(819))/10));
       //vel_est+=((accel_est)*9.81/15);
       // read the analog joint angles:
-      
+      /*
       for(int n=0;n<=5;n++){
         sensorValue = analogRead(analogInPin+n);            
         Serial.print(sensorValue);   
         Serial.print(",");
       }
+      */
       digitalWrite(13,0);
       accelRDY=0;
-      Serial.println();
+      //Serial.println();
+      
     }
   }
 }
