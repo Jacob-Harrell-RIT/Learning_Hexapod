@@ -1,0 +1,38 @@
+#include <Wire.h>
+
+const int analogInPin = A0;  // Analog input pin that the 1st potentiometer is attached to
+int sensorValue = 0;        // value read from the pot
+int n=0;
+unsigned long int now=0;
+unsigned long int past=0;
+
+void setup(void)
+{
+  Serial.begin(115200);
+  pinMode(2,INPUT);
+  pinMode(13,OUTPUT);
+  digitalWrite(13,0);
+  past=millis();
+  now=millis();
+}
+
+void loop(void)
+{
+    now=micros();
+    // read the analog joint angles:
+    for(n=0;n<=3;n++){
+      sensorValue = analogRead(analogInPin+n);            
+      //Serial.print("s" );  
+      //Serial.print(n);
+      //Serial.print(':');
+      Serial.print(sensorValue);   
+      Serial.print(",");
+      if ((unsigned long)(now-past)>20000){//check if timer has overflowed
+        //Serial.print("t:");
+        Serial.println(now-past);//print time diff
+        past=now;
+        digitalWrite(13,0);
+      }
+    }
+    delay(66);//EXECUTE ORDER 66 (15 hz-->66.6666 ms)
+}
