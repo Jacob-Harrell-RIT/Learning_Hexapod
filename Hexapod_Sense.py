@@ -39,7 +39,7 @@ class hexSense:
                     self.state_string=d1
                     #print(d1)
                     rx_state=self.state_string.split(",")
-                    if len(rx_state)!=5:
+                    if len(rx_state)!=6:
                        return False
                     elif rx_state[len(rx_state)-1]!='\r\n':
                         #print('5')
@@ -47,7 +47,7 @@ class hexSense:
                         return False
                     elif rx_state[0]=='':
                       return False
-                    self.state_array=rx_state[0:4]
+                    self.state_array=rx_state[0:5]
                     #print(self.state_array)
                     return True
         else:
