@@ -1,3 +1,4 @@
+#include <TimerOne.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303.h>
@@ -8,6 +9,8 @@ const int analogInPin = A0;  // Analog input pin that the 1st potentiometer is a
 volatile int sensorValue = 0;        // value read from the pot
 int n=0;
 Adafruit_LSM303 lsm;
+unsigned long int now=0;
+unsigned long int before=0;
 
 void setup(void)
 {
@@ -15,6 +18,9 @@ void setup(void)
   pinMode(2,INPUT);
   pinMode(13,OUTPUT);
   digitalWrite(13,0);
+  Timer1.initialize(10000000);
+  Timer1.stop();
+  
     if(!lsm.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
@@ -27,24 +33,29 @@ void setup(void)
     }
   }
   attachInterrupt(0,LSM_RDY,FALLING);
-  //past=millis();
-  //now=millis();
+  Timer1.restart();
+  now=Timer1.read();
+  before=now;
 }
 //(15 hz-->66.6666 ms)
+
+
 void loop(void)
-{
+{  
   if(rdy==1){
-    //now=micros();
+    now=Timer1.read();
     lsm.read();
     for(n=0;n<=3;n++){
       sensorValue = analogRead(analogInPin+n);
       Serial.print(sensorValue);   
       Serial.print(",");
      }
-     Serial.println();
+     Serial.print(now);
+     Serial.println(',');
      rdy=0;
      digitalWrite(13,0);
-  }
+     Timer1.restart();
+    }
 }
 
 void LSM_RDY(void){
