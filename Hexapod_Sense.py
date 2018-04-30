@@ -35,21 +35,23 @@ class hexSense:
                 d1=[]
                 if (self.port.inWaiting()): #get a whole line
                     #TODO deal with sending state data to learning algorithm
-                    d1=self.port.readline(self.port.inWaiting())                    
+                    d1=self.port.readline()                    
                     self.state_string=d1
+                    #print(d1)
                     rx_state=self.state_string.split(",")
-                    if len(rx_state)!=13:
-                        return False
-                    elif rx_state[12]!='\r\n':
+                    if len(rx_state)!=5:
+                       return False
+                    elif rx_state[len(rx_state)-1]!='\r\n':
+                        #print('5')
+                        #print (rx_state[len(rx_state)-1])
                         return False
                     elif rx_state[0]=='':
-                        return False
-                    self.state_array=rx_state[0:12]
+                      return False
+                    self.state_array=rx_state[0:4]
                     #print(self.state_array)
                     return True
         else:
             return False            
-
 
 
 
