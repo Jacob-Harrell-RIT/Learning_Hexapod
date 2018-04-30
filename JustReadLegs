@@ -2,13 +2,12 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_LSM303.h>
 
-Adafruit_LSM303 lsm;
-const int analogInPin = A0;  // Analog input pin that the 1st potentiometer is attached to
-int sensorValue = 0;        // value read from the pot
-int n=0;
-unsigned long int now=0;
-unsigned long int past=0;
+
 volatile int rdy=0;
+const int analogInPin = A0;  // Analog input pin that the 1st potentiometer is attached to
+volatile int sensorValue = 0;        // value read from the pot
+int n=0;
+Adafruit_LSM303 lsm;
 
 void setup(void)
 {
@@ -28,28 +27,23 @@ void setup(void)
     }
   }
   attachInterrupt(0,LSM_RDY,FALLING);
-  past=millis();
-  now=millis();
+  //past=millis();
+  //now=millis();
 }
 //(15 hz-->66.6666 ms)
 void loop(void)
 {
   if(rdy==1){
-    now=micros();
+    //now=micros();
     lsm.read();
-    // read the analog joint angles:
     for(n=0;n<=3;n++){
       sensorValue = analogRead(analogInPin+n);
       Serial.print(sensorValue);   
       Serial.print(",");
-    }
-    if ((unsigned long)(now-past)>20000){//check if timer has overflowed
-      //Serial.print("t:");
-      Serial.println(now-past);//print time diff
-      past=now;
-      rdy=0;
-      digitalWrite(13,0);
-    }
+     }
+     Serial.println();
+     rdy=0;
+     digitalWrite(13,0);
   }
 }
 
