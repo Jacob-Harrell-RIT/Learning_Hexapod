@@ -1,10 +1,14 @@
 #include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM303.h>
 
+Adafruit_LSM303 lsm;
 const int analogInPin = A0;  // Analog input pin that the 1st potentiometer is attached to
 int sensorValue = 0;        // value read from the pot
 int n=0;
 unsigned long int now=0;
 unsigned long int past=0;
+volatile int rdy=0;
 
 void setup(void)
 {
@@ -12,27 +16,44 @@ void setup(void)
   pinMode(2,INPUT);
   pinMode(13,OUTPUT);
   digitalWrite(13,0);
+    if(!lsm.begin())
+  {
+    /* There was a problem detecting the ADXL345 ... check your connections */
+    Serial.println("no LSM303 detected");
+    while(1){
+      digitalWrite(13,1);
+      delay(100);
+      digitalWrite(13,0);
+      delay(100);
+    }
+  }
+  attachInterrupt(0,LSM_RDY,FALLING);
   past=millis();
   now=millis();
 }
-
+//(15 hz-->66.6666 ms)
 void loop(void)
 {
+  if(rdy==1){
     now=micros();
+    lsm.read();
     // read the analog joint angles:
     for(n=0;n<=3;n++){
-      sensorValue = analogRead(analogInPin+n);            
-      //Serial.print("s" );  
-      //Serial.print(n);
-      //Serial.print(':');
+      sensorValue = analogRead(analogInPin+n);
       Serial.print(sensorValue);   
       Serial.print(",");
-      if ((unsigned long)(now-past)>20000){//check if timer has overflowed
-        //Serial.print("t:");
-        Serial.println(now-past);//print time diff
-        past=now;
-        digitalWrite(13,0);
-      }
     }
-    delay(66);//EXECUTE ORDER 66 (15 hz-->66.6666 ms)
+    if ((unsigned long)(now-past)>20000){//check if timer has overflowed
+      //Serial.print("t:");
+      Serial.println(now-past);//print time diff
+      past=now;
+      rdy=0;
+      digitalWrite(13,0);
+    }
+  }
 }
+
+void LSM_RDY(void){
+  rdy=1;
+  digitalWrite(13,1);
+ }
